@@ -1,17 +1,25 @@
-import { Editor } from "@tiptap/core";
+import { Editor, JSONContent } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
+import Heading from '@tiptap/extension-heading'
 
 export type EditorState = {
   html: string;
+  json: JSONContent;
   canBold: boolean;
   canItalic: boolean;
   canStrike: boolean;
   canSinkListItem: boolean;
   canLiftListItem: boolean;
+  canH1: boolean;
+  canH2: boolean;
+  canH3: boolean;
   isBulletListActive: boolean;
   isBoldActive: boolean;
   isItalicActive: boolean;
   isStrikeActive: boolean;
+  isH1Active: boolean;
+  isH2Active: boolean;
+  isH3Active: boolean;
 };
 
 export type WebViewMessage =
@@ -28,21 +36,31 @@ function sendMessageFromWebView(params: WebViewMessage) {
 function getEditorState(editor: Editor): EditorState {
   return {
     html: editor.getHTML(),
+    json: editor.getJSON(),
     canBold: editor.can().chain().focus().toggleBold().run(),
     canItalic: editor.can().chain().focus().toggleItalic().run(),
     canStrike: editor.can().chain().focus().toggleStrike().run(),
     canSinkListItem: editor.can().sinkListItem("listItem"),
     canLiftListItem: editor.can().liftListItem("listItem"),
+    canH1: editor.can().chain().focus().toggleHeading({level: 1}).run(),
+    canH2: editor.can().chain().focus().toggleHeading({level: 2}).run(),
+    canH3: editor.can().chain().focus().toggleHeading({level: 3}).run(),
     isBulletListActive: editor.isActive("bulletList"),
     isBoldActive: editor.isActive("bold"),
     isItalicActive: editor.isActive("italic"),
     isStrikeActive: editor.isActive("strike"),
+    isH1Active: editor.isActive("heading", { level: 1 }),
+    isH2Active: editor.isActive("heading", { level: 2 }),
+    isH3Active: editor.isActive("heading", { level: 3 }),
   };
 }
 
 const editor = new Editor({
   element: document.getElementById("editor")!,
-  extensions: [StarterKit],
+  extensions: [StarterKit,
+    Heading.configure({
+    levels: [1, 2, 3],
+  }),],
   onCreate: () => {
     sendMessageFromWebView({ kind: "editorInitialised" });
   },
@@ -66,7 +84,10 @@ type EditorAction =
   | "toggleStrike"
   | "toggleListItem"
   | "sinkListItem"
-  | "liftListItem";
+  | "liftListItem"
+  | "toggleH1"
+  | "toggleH2"
+  | "toggleH3";
 
 const editorActions: Record<EditorAction, VoidFunction> = {
   liftListItem: () => editor.chain().focus().liftListItem("listItem").run(),
@@ -75,6 +96,9 @@ const editorActions: Record<EditorAction, VoidFunction> = {
   toggleBold: () => editor.chain().focus().toggleBold().run(),
   toggleItalic: () => editor.chain().focus().toggleItalic().run(),
   toggleStrike: () => editor.chain().focus().toggleStrike().run(),
+  toggleH1: () => editor.chain().focus().toggleHeading({level:1}).run(),
+  toggleH2: () => editor.chain().focus().toggleHeading({level:2}).run(),
+  toggleH3: () => editor.chain().focus().toggleHeading({level:3}).run(),
 };
 
 export type NativeMessage =

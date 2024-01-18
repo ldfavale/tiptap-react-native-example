@@ -22,15 +22,22 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
   const { content = "" } = props;
   const [editorState, setEditorState] = useState<EditorState>({
     html: "",
+    json: {},
     canBold: false,
     canItalic: false,
     canStrike: false,
     canSinkListItem: false,
     canLiftListItem: false,
+    canH1: false,
+    canH2: false,
+    canH3: false,
     isBulletListActive: false,
     isBoldActive: false,
     isItalicActive: false,
     isStrikeActive: false,
+    isH1Active: false,
+    isH2Active: false,
+    isH3Active: false,
   });
 
   const webViewRef = useRef<WebView>(null);
@@ -85,6 +92,47 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
         >
           <Text>Toggle List</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() =>
+            sendMessageToWebView({ kind: "action", payload: "toggleH1" })
+          }
+          style={[
+            styles.actionDefault,
+            editorState.isH1Active
+              ? styles.actionActive
+              : styles.actionInactive,
+          ]}
+        >
+          <Text>H1</Text>
+        </TouchableOpacity>
+          <TouchableOpacity
+          onPress={() =>
+            sendMessageToWebView({ kind: "action", payload: "toggleH2" })
+          }
+          style={[
+            styles.actionDefault,
+            editorState.isH2Active
+              ? styles.actionActive
+              : styles.actionInactive,
+          ]}
+        >
+          <Text>H2</Text>
+        </TouchableOpacity>
+          <TouchableOpacity
+          onPress={() =>
+            sendMessageToWebView({ kind: "action", payload: "toggleH3" })
+          }
+          style={[
+            styles.actionDefault,
+            editorState.isH3Active
+              ? styles.actionActive
+              : styles.actionInactive,
+          ]}
+        >
+          <Text>H3</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() =>
             sendMessageToWebView({ kind: "action", payload: "sinkListItem" })
@@ -144,7 +192,7 @@ const styles = {
   ...StyleSheet.create({
     container: {
       flex: 1,
-      maxHeight: 200,
+      // maxHeight: 200, When this is able i can't change editor styles i don't know why
     },
     actions: { flexDirection: "row", gap: 4, padding: 4 },
     actionDefault: {
