@@ -6,6 +6,10 @@
       content="user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0"
     />
     <style>
+       :root{
+        --text-color: rgb(55, 53, 47);
+      }
+
       * {
         outline: 0px solid transparent;
         -webkit-tap-highlight-color: #000000;
@@ -16,16 +20,13 @@
       body {
         flex: 1;
         outline: 0;
-        padding: 0;
         margin: 0;
-        font-family: "-apple-system", "HelveticaNeue", Helvetica, Roboto, Arial,
-          sans-serif;
-        font-size: 1em;
-        color: #000000;
-
+        font-family: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
+        font-size: 1.1em;
+        color: rgb(55, 53, 47);
         height: 100%;
+        width: 100%;
         min-height: 100%;
-
         overflow: hidden;
       }
       p {
@@ -60,12 +61,12 @@
 
       .ProseMirror ul {
         list-style: disc;
-        margin-left: 20px;
+        padding-left: 20px ;
       }
 
       .ProseMirror ol {
         list-style: decimal;
-        margin-left: 20px;
+        padding-left: 20px ;
       }
 
       .ProseMirror a {
@@ -102,15 +103,16 @@
     </style>
   </head>
   <body>
-    <div style="height: 100vh;">
+    <div style="height: 100vh; flex: 1;">
       <div
         id="editor"
         style="
-          width: 100%;
+          flex: 1;
           height: 100%;
           max-height: 100%;
-          background: white;
           overflow-y: scroll;
+          padding: 0;
+          margin: 20px;
         "
       ></div>
     </div>
