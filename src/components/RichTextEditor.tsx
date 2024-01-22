@@ -6,6 +6,7 @@ import {
   Text,
   View,
   TouchableWithoutFeedback,
+  FlatList
 } from "react-native";
 import { WebView } from "react-native-webview";
 import editorHtml from "../editor/dist/index.html";
@@ -50,111 +51,118 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     webViewRef?.current?.postMessage(JSON.stringify(message));
   }
 
+  const editorCommands = [
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleBold" }),
+      style: [
+        styles.actionDefault,
+        editorState.isBoldActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "Bold"
+    },
+    {
+      onPress: () => {
+        console.log("Booold")
+        sendMessageToWebView({ kind: "action", payload: "toggleItalic" })
+      },
+        style: [
+        styles.actionDefault,
+        editorState.isItalicActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "Italic"
+    },
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleListItem" }),
+      style: [
+        styles.actionDefault,
+        editorState.isBulletListActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "Toggle List"
+    },
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleH1" }),
+      style: [
+        styles.actionDefault,
+        editorState.isBoldActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "H1"
+    },
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleH2" }),
+      style: [
+        styles.actionDefault,
+        editorState.isH1Active
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "H2"
+    },
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleH3" }),
+      style: [
+        styles.actionDefault,
+        editorState.isH2Active
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "H3"
+    },
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "sinkListItem" }),
+      style: [
+        styles.actionDefault,
+        !editorState.canSinkListItem ? styles.actionDisabled : {},
+      ],
+      text: "Sink"
+    },
+    {
+      onPress: () => {
+
+        sendMessageToWebView({ kind: "action", payload: "liftListItem" })
+      },
+      style: [
+        styles.actionDefault,
+        !editorState.canLiftListItem ? styles.actionDisabled : {},
+      ],
+      text: "Lift",
+    },
+    {
+      onPress: () => {
+        const url = "https://educacionplasticayvisual.com/wp-content/uploads/imagen-funcion-estetica.jpg"
+        sendMessageToWebView({ kind: "insertImage", payload: url });
+    },
+      style: [
+        styles.actionDefault
+      ],
+      text: "Img",
+    },
+  ]
+
   return (
     <View style={styles.container}>
       <View style={styles.actions}>
-        <TouchableOpacity
-          onPress={() =>
-            sendMessageToWebView({ kind: "action", payload: "toggleBold" })
-          }
-          style={[
-            styles.actionDefault,
-            editorState.isBoldActive
-              ? styles.actionActive
-              : styles.actionInactive,
-          ]}
-        >
-          <Text>Bold</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            sendMessageToWebView({ kind: "action", payload: "toggleItalic" })
-          }
-          style={[
-            styles.actionDefault,
-            editorState.isItalicActive
-              ? styles.actionActive
-              : styles.actionInactive,
-          ]}
-        >
-          <Text>Italic</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            sendMessageToWebView({ kind: "action", payload: "toggleListItem" })
-          }
-          style={[
-            styles.actionDefault,
-            editorState.isBulletListActive
-              ? styles.actionActive
-              : styles.actionInactive,
-          ]}
-        >
-          <Text>Toggle List</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() =>
-            sendMessageToWebView({ kind: "action", payload: "toggleH1" })
-          }
-          style={[
-            styles.actionDefault,
-            editorState.isH1Active
-              ? styles.actionActive
-              : styles.actionInactive,
-          ]}
-        >
-          <Text>H1</Text>
-        </TouchableOpacity>
+      <FlatList
+        data={editorCommands}
+        horizontal
+        renderItem={({item, index, separators}) => (
           <TouchableOpacity
-          onPress={() =>
-            sendMessageToWebView({ kind: "action", payload: "toggleH2" })
-          }
-          style={[
-            styles.actionDefault,
-            editorState.isH2Active
-              ? styles.actionActive
-              : styles.actionInactive,
-          ]}
-        >
-          <Text>H2</Text>
-        </TouchableOpacity>
-          <TouchableOpacity
-          onPress={() =>
-            sendMessageToWebView({ kind: "action", payload: "toggleH3" })
-          }
-          style={[
-            styles.actionDefault,
-            editorState.isH3Active
-              ? styles.actionActive
-              : styles.actionInactive,
-          ]}
-        >
-          <Text>H3</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() =>
-            sendMessageToWebView({ kind: "action", payload: "sinkListItem" })
-          }
-          style={[
-            styles.actionDefault,
-            !editorState.canSinkListItem ? styles.actionDisabled : {},
-          ]}
-        >
-          <Text>Sink List item</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            sendMessageToWebView({ kind: "action", payload: "liftListItem" })
-          }
-          style={[
-            styles.actionDefault,
-            !editorState.canLiftListItem ? styles.actionDisabled : {},
-          ]}
-        >
-          <Text>Lift List item</Text>
-        </TouchableOpacity>
+            key={item.text}
+            onPress={item.onPress}
+            style={item.style}
+            >
+            <Text>{item.text}</Text>
+          </TouchableOpacity>
+        )}
+      />
       </View>
       <TouchableWithoutFeedback
         onPress={() => {
@@ -192,11 +200,10 @@ const styles = {
   ...StyleSheet.create({
     container: {
       flex: 1,
-      // maxHeight: 200, When this is able i can't change editor styles i don't know why
     },
     actions: { flexDirection: "row", gap: 4, padding: 4 },
     actionDefault: {
-      padding: 4,
+      padding: 6,
       borderRadius: 6,
     },
     actionActive: { backgroundColor: "rgba(0,0,0,0.1)" },

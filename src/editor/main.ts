@@ -1,6 +1,7 @@
 import { Editor, JSONContent } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Heading from '@tiptap/extension-heading'
+import Image from '@tiptap/extension-image'
 
 export type EditorState = {
   html: string;
@@ -57,10 +58,11 @@ function getEditorState(editor: Editor): EditorState {
 
 const editor = new Editor({
   element: document.getElementById("editor")!,
-  extensions: [StarterKit,
-    Heading.configure({
-    levels: [1, 2, 3],
-  }),],
+  extensions: [
+    StarterKit,
+    Heading.configure({levels: [1, 2, 3]}),
+    Image.configure({allowBase64: true})
+],
   onCreate: () => {
     sendMessageFromWebView({ kind: "editorInitialised" });
   },
@@ -98,13 +100,14 @@ const editorActions: Record<EditorAction, VoidFunction> = {
   toggleStrike: () => editor.chain().focus().toggleStrike().run(),
   toggleH1: () => editor.chain().focus().toggleHeading({level:1}).run(),
   toggleH2: () => editor.chain().focus().toggleHeading({level:2}).run(),
-  toggleH3: () => editor.chain().focus().toggleHeading({level:3}).run(),
+  toggleH3: () => editor.chain().focus().toggleHeading({level:3}).run()
 };
 
 export type NativeMessage =
   | { kind: "action"; payload: EditorAction }
   | { kind: "editor"; payload: "focus" | "blur" }
-  | { kind: "initialContent"; payload: string };
+  | { kind: "initialContent"; payload: string }
+  | { kind: "insertImage"; payload: string };
 
 function handleMessageEvent(event: MessageEvent | Event) {
   const message: { data: string } = event as { data: string };
@@ -115,6 +118,9 @@ function handleMessageEvent(event: MessageEvent | Event) {
   }
   if (nativeMessage.kind === "initialContent") {
     editor.commands.setContent(nativeMessage.payload);
+  }
+  if (nativeMessage.kind === "insertImage") {
+    editor.chain().focus().setImage({ src: nativeMessage.payload }).run();
   }
   if (nativeMessage.kind === "editor") {
     if (nativeMessage.payload === "focus") {
