@@ -32,6 +32,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     canH1: false,
     canH2: false,
     canH3: false,
+    canBlockquote: false,
     isBulletListActive: false,
     isBoldActive: false,
     isItalicActive: false,
@@ -39,6 +40,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     isH1Active: false,
     isH2Active: false,
     isH3Active: false,
+    isBlockquoteActive: false,
   });
 
   const webViewRef = useRef<WebView>(null);
@@ -114,6 +116,16 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
           : styles.actionInactive,
       ],
       text: "H3"
+    },
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleBlockquote" }),
+      style: [
+        styles.actionDefault,
+        editorState.isBlockquoteActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "Quote"
     },
     {
       onPress: () => sendMessageToWebView({ kind: "action", payload: "sinkListItem" }),

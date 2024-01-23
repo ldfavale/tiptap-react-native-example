@@ -2,6 +2,8 @@ import { Editor, JSONContent } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Heading from '@tiptap/extension-heading'
 import Image from '@tiptap/extension-image'
+import Blockquote from '@tiptap/extension-blockquote'
+
 
 export type EditorState = {
   html: string;
@@ -14,6 +16,7 @@ export type EditorState = {
   canH1: boolean;
   canH2: boolean;
   canH3: boolean;
+  canBlockquote: boolean
   isBulletListActive: boolean;
   isBoldActive: boolean;
   isItalicActive: boolean;
@@ -21,6 +24,7 @@ export type EditorState = {
   isH1Active: boolean;
   isH2Active: boolean;
   isH3Active: boolean;
+  isBlockquoteActive: boolean;
 };
 
 export type WebViewMessage =
@@ -46,6 +50,7 @@ function getEditorState(editor: Editor): EditorState {
     canH1: editor.can().chain().focus().toggleHeading({level: 1}).run(),
     canH2: editor.can().chain().focus().toggleHeading({level: 2}).run(),
     canH3: editor.can().chain().focus().toggleHeading({level: 3}).run(),
+    canBlockquote: editor.can().chain().focus().toggleBlockquote().run(),
     isBulletListActive: editor.isActive("bulletList"),
     isBoldActive: editor.isActive("bold"),
     isItalicActive: editor.isActive("italic"),
@@ -53,6 +58,7 @@ function getEditorState(editor: Editor): EditorState {
     isH1Active: editor.isActive("heading", { level: 1 }),
     isH2Active: editor.isActive("heading", { level: 2 }),
     isH3Active: editor.isActive("heading", { level: 3 }),
+    isBlockquoteActive: editor.isActive("blockquote"),
   };
 }
 
@@ -61,19 +67,24 @@ const editor = new Editor({
   extensions: [
     StarterKit,
     Heading.configure({levels: [1, 2, 3]}),
-    Image.configure({allowBase64: true})
+    Image.configure({allowBase64: true}),
+    Blockquote.configure({
+      HTMLAttributes: {
+        class: 'blockquote',
+      },
+    })
 ],
   onCreate: () => {
     sendMessageFromWebView({ kind: "editorInitialised" });
   },
   onSelectionUpdate: ({ editor }) => {
-    sendMessageFromWebView({
+        sendMessageFromWebView({
       kind: "editorStateUpdate",
       payload: getEditorState(editor),
     });
   },
   onUpdate: ({ editor }) => {
-    sendMessageFromWebView({
+        sendMessageFromWebView({
       kind: "editorStateUpdate",
       payload: getEditorState(editor),
     });
@@ -89,7 +100,8 @@ type EditorAction =
   | "liftListItem"
   | "toggleH1"
   | "toggleH2"
-  | "toggleH3";
+  | "toggleH3"
+  | "toggleBlockquote";
 
 const editorActions: Record<EditorAction, VoidFunction> = {
   liftListItem: () => editor.chain().focus().liftListItem("listItem").run(),
@@ -100,7 +112,8 @@ const editorActions: Record<EditorAction, VoidFunction> = {
   toggleStrike: () => editor.chain().focus().toggleStrike().run(),
   toggleH1: () => editor.chain().focus().toggleHeading({level:1}).run(),
   toggleH2: () => editor.chain().focus().toggleHeading({level:2}).run(),
-  toggleH3: () => editor.chain().focus().toggleHeading({level:3}).run()
+  toggleH3: () => editor.chain().focus().toggleHeading({level:3}).run(),
+  toggleBlockquote: () => editor.chain().focus().toggleBlockquote().run()
 };
 
 export type NativeMessage =

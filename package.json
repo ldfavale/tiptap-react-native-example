@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "npx expo start -c",
+    "start": "npx expo start -c --tunnel",
     "android": "expo start -c --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tiptap/core": "^2.0.3",
+    "@tiptap/extension-blockquote": "^2.1.16",
     "@tiptap/extension-image": "^2.1.16",
     "@tiptap/starter-kit": "^2.0.3",
     "@types/react": "~18.0.27",
