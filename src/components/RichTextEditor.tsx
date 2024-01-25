@@ -103,6 +103,15 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
       text: "undln"
     },
     {
+      onPress: () => {
+        sendMessageToWebView({ kind: "action", payload: "setHorizontalRule" })
+      },
+        style: [
+        styles.actionDefault,
+      ],
+      text: "line"
+    },
+    {
       onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleBulletListItem" }),
       style: [
         styles.actionDefault,

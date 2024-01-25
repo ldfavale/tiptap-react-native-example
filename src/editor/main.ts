@@ -16,6 +16,7 @@ export type EditorState = {
   canItalic: boolean;
   canStrike: boolean;
   canUnderline: boolean;
+  canHorizontalRule: boolean;
   canSinkListItem: boolean;
   canLiftListItem: boolean;
   canH1: boolean;
@@ -54,6 +55,7 @@ function getEditorState(editor: Editor): EditorState {
     canItalic: editor.can().chain().focus().toggleItalic().run(),
     canStrike: editor.can().chain().focus().toggleStrike().run(),
     canUnderline: editor.can().chain().focus().toggleUnderline().run(),
+    canHorizontalRule: editor.can().chain().focus().setHorizontalRule().run(),
     canSinkListItem: editor.can().sinkListItem("listItem"),
     canLiftListItem: editor.can().liftListItem("listItem"),
     canH1: editor.can().chain().focus().toggleHeading({level: 1}).run(),
@@ -123,7 +125,8 @@ type EditorAction =
   | "toggleH1"
   | "toggleH2"
   | "toggleH3"
-  | "toggleBlockquote";
+  | "toggleBlockquote"
+  | "setHorizontalRule";
 
 const editorActions: Record<EditorAction, VoidFunction> = {
   liftListItem: () => editor.chain().focus().liftListItem("listItem").run(),
@@ -138,7 +141,8 @@ const editorActions: Record<EditorAction, VoidFunction> = {
   toggleH1: () => editor.chain().focus().toggleHeading({level:1}).run(),
   toggleH2: () => editor.chain().focus().toggleHeading({level:2}).run(),
   toggleH3: () => editor.chain().focus().toggleHeading({level:3}).run(),
-  toggleBlockquote: () => editor.chain().focus().toggleBlockquote().run()
+  toggleBlockquote: () => editor.chain().focus().toggleBlockquote().run(),
+  setHorizontalRule: () => editor.chain().focus().setHorizontalRule().run()
 };
 
 export type NativeMessage =
