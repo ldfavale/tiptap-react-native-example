@@ -79,6 +79,18 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
       text: "Italic"
     },
     {
+      onPress: () => {
+        sendMessageToWebView({ kind: "action", payload: "toggleStrike" })
+      },
+        style: [
+        styles.actionDefault,
+        editorState.isStrikeActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "Strike"
+    },
+    {
       onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleBulletListItem" }),
       style: [
         styles.actionDefault,
