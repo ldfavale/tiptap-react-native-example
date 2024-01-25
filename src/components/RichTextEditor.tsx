@@ -34,6 +34,8 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     canH3: false,
     canBlockquote: false,
     isBulletListActive: false,
+    isOrderedListActive: false,
+    isTaskListActive: false,
     isBoldActive: false,
     isItalicActive: false,
     isStrikeActive: false,
@@ -66,7 +68,6 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     },
     {
       onPress: () => {
-        console.log("Booold")
         sendMessageToWebView({ kind: "action", payload: "toggleItalic" })
       },
         style: [
@@ -78,14 +79,34 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
       text: "Italic"
     },
     {
-      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleListItem" }),
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleBulletListItem" }),
       style: [
         styles.actionDefault,
         editorState.isBulletListActive
           ? styles.actionActive
           : styles.actionInactive,
       ],
-      text: "Toggle List"
+      text: "ul"
+    },
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleOrderedListItem" }),
+      style: [
+        styles.actionDefault,
+        editorState.isOrderedListActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "ol"
+    },
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleTaskListItem" }),
+      style: [
+        styles.actionDefault,
+        editorState.isTaskListActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "task"
     },
     {
       onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleH1" }),

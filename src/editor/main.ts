@@ -3,6 +3,8 @@ import StarterKit from "@tiptap/starter-kit";
 import Heading from '@tiptap/extension-heading'
 import Image from '@tiptap/extension-image'
 import Blockquote from '@tiptap/extension-blockquote'
+import TaskItem from '@tiptap/extension-task-item'
+import TaskList from '@tiptap/extension-task-list'
 
 
 export type EditorState = {
@@ -18,6 +20,8 @@ export type EditorState = {
   canH3: boolean;
   canBlockquote: boolean
   isBulletListActive: boolean;
+  isOrderedListActive: boolean;
+  isTaskListActive: boolean;
   isBoldActive: boolean;
   isItalicActive: boolean;
   isStrikeActive: boolean;
@@ -52,6 +56,8 @@ function getEditorState(editor: Editor): EditorState {
     canH3: editor.can().chain().focus().toggleHeading({level: 3}).run(),
     canBlockquote: editor.can().chain().focus().toggleBlockquote().run(),
     isBulletListActive: editor.isActive("bulletList"),
+    isOrderedListActive: editor.isActive("orderedList"),
+    isTaskListActive: editor.isActive("taskList"),
     isBoldActive: editor.isActive("bold"),
     isItalicActive: editor.isActive("italic"),
     isStrikeActive: editor.isActive("strike"),
@@ -72,7 +78,13 @@ const editor = new Editor({
       HTMLAttributes: {
         class: 'blockquote',
       },
-    })
+    }),
+    TaskList,
+    TaskItem.configure({
+      nested: true,
+    }),
+
+
 ],
   onCreate: () => {
     sendMessageFromWebView({ kind: "editorInitialised" });
@@ -95,7 +107,9 @@ type EditorAction =
   | "toggleBold"
   | "toggleItalic"
   | "toggleStrike"
-  | "toggleListItem"
+  | "toggleBulletListItem"
+  | "toggleOrderedListItem"
+  | "toggleTaskListItem"
   | "sinkListItem"
   | "liftListItem"
   | "toggleH1"
@@ -106,7 +120,9 @@ type EditorAction =
 const editorActions: Record<EditorAction, VoidFunction> = {
   liftListItem: () => editor.chain().focus().liftListItem("listItem").run(),
   sinkListItem: () => editor.chain().focus().sinkListItem("listItem").run(),
-  toggleListItem: () => editor.chain().focus().toggleBulletList().run(),
+  toggleBulletListItem: () => editor.chain().focus().toggleBulletList().run(),
+  toggleOrderedListItem: () => editor.chain().focus().toggleOrderedList().run(),
+  toggleTaskListItem: () => editor.chain().focus().toggleTaskList().run(),
   toggleBold: () => editor.chain().focus().toggleBold().run(),
   toggleItalic: () => editor.chain().focus().toggleItalic().run(),
   toggleStrike: () => editor.chain().focus().toggleStrike().run(),
