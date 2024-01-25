@@ -91,6 +91,18 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
       text: "Strike"
     },
     {
+      onPress: () => {
+        sendMessageToWebView({ kind: "action", payload: "toggleUnderline" })
+      },
+        style: [
+        styles.actionDefault,
+        editorState.isUnderlineActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "undln"
+    },
+    {
       onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleBulletListItem" }),
       style: [
         styles.actionDefault,

@@ -5,6 +5,8 @@ import Image from '@tiptap/extension-image'
 import Blockquote from '@tiptap/extension-blockquote'
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
+import Underline from '@tiptap/extension-underline'
+
 
 
 export type EditorState = {
@@ -13,6 +15,7 @@ export type EditorState = {
   canBold: boolean;
   canItalic: boolean;
   canStrike: boolean;
+  canUnderline: boolean;
   canSinkListItem: boolean;
   canLiftListItem: boolean;
   canH1: boolean;
@@ -25,6 +28,7 @@ export type EditorState = {
   isBoldActive: boolean;
   isItalicActive: boolean;
   isStrikeActive: boolean;
+  isUnderlineActive: boolean;
   isH1Active: boolean;
   isH2Active: boolean;
   isH3Active: boolean;
@@ -49,6 +53,7 @@ function getEditorState(editor: Editor): EditorState {
     canBold: editor.can().chain().focus().toggleBold().run(),
     canItalic: editor.can().chain().focus().toggleItalic().run(),
     canStrike: editor.can().chain().focus().toggleStrike().run(),
+    canUnderline: editor.can().chain().focus().toggleUnderline().run(),
     canSinkListItem: editor.can().sinkListItem("listItem"),
     canLiftListItem: editor.can().liftListItem("listItem"),
     canH1: editor.can().chain().focus().toggleHeading({level: 1}).run(),
@@ -61,6 +66,7 @@ function getEditorState(editor: Editor): EditorState {
     isBoldActive: editor.isActive("bold"),
     isItalicActive: editor.isActive("italic"),
     isStrikeActive: editor.isActive("strike"),
+    isUnderlineActive: editor.isActive("underline"),
     isH1Active: editor.isActive("heading", { level: 1 }),
     isH2Active: editor.isActive("heading", { level: 2 }),
     isH3Active: editor.isActive("heading", { level: 3 }),
@@ -83,6 +89,7 @@ const editor = new Editor({
     TaskItem.configure({
       nested: true,
     }),
+    Underline
 
 
 ],
@@ -107,6 +114,7 @@ type EditorAction =
   | "toggleBold"
   | "toggleItalic"
   | "toggleStrike"
+  | "toggleUnderline"
   | "toggleBulletListItem"
   | "toggleOrderedListItem"
   | "toggleTaskListItem"
@@ -126,6 +134,7 @@ const editorActions: Record<EditorAction, VoidFunction> = {
   toggleBold: () => editor.chain().focus().toggleBold().run(),
   toggleItalic: () => editor.chain().focus().toggleItalic().run(),
   toggleStrike: () => editor.chain().focus().toggleStrike().run(),
+  toggleUnderline: () => editor.chain().focus().toggleUnderline().run(),
   toggleH1: () => editor.chain().focus().toggleHeading({level:1}).run(),
   toggleH2: () => editor.chain().focus().toggleHeading({level:2}).run(),
   toggleH3: () => editor.chain().focus().toggleHeading({level:3}).run(),
