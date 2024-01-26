@@ -33,6 +33,10 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     canH2: false,
     canH3: false,
     canBlockquote: false,
+    canUnderline: false,
+    canHorizontalRule: false,
+    canUndo: false,
+    canRedo: false,
     isBulletListActive: false,
     isOrderedListActive: false,
     isTaskListActive: false,
@@ -43,6 +47,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     isH2Active: false,
     isH3Active: false,
     isBlockquoteActive: false,
+    isUnderlineActive: false,
   });
 
   const webViewRef = useRef<WebView>(null);
@@ -52,10 +57,28 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
   }, [content]);
 
   function sendMessageToWebView(message: NativeMessage) {
-    webViewRef?.current?.postMessage(JSON.stringify(message));
+     webViewRef?.current?.postMessage(JSON.stringify(message));
   }
 
   const editorCommands = [
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "undo" }),
+      style: [
+        styles.actionDefault,
+        !editorState.canUndo ? styles.actionDisabled : {},
+      ],
+      text: "Undo",
+      disabled: !editorState.canUndo
+    },
+    {
+      onPress: () => sendMessageToWebView({ kind: "action", payload: "redo" }),
+      style: [
+        styles.actionDefault,
+        !editorState.canRedo ? styles.actionDisabled : {},
+      ],
+      text: "Redo",
+      disabled: !editorState.canRedo
+    },
     {
       onPress: () => sendMessageToWebView({ kind: "action", payload: "toggleBold" }),
       style: [
@@ -224,6 +247,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
             key={item.text}
             onPress={item.onPress}
             style={item.style}
+            disabled={item.disabled}
             >
             <Text>{item.text}</Text>
           </TouchableOpacity>

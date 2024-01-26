@@ -23,6 +23,8 @@ export type EditorState = {
   canH2: boolean;
   canH3: boolean;
   canBlockquote: boolean
+  canUndo: boolean
+  canRedo: boolean
   isBulletListActive: boolean;
   isOrderedListActive: boolean;
   isTaskListActive: boolean;
@@ -62,6 +64,8 @@ function getEditorState(editor: Editor): EditorState {
     canH2: editor.can().chain().focus().toggleHeading({level: 2}).run(),
     canH3: editor.can().chain().focus().toggleHeading({level: 3}).run(),
     canBlockquote: editor.can().chain().focus().toggleBlockquote().run(),
+    canUndo: editor.can().chain().focus().undo().run(),
+    canRedo: editor.can().chain().focus().redo().run(),
     isBulletListActive: editor.isActive("bulletList"),
     isOrderedListActive: editor.isActive("orderedList"),
     isTaskListActive: editor.isActive("taskList"),
@@ -113,6 +117,8 @@ const editor = new Editor({
 });
 
 type EditorAction =
+  | "undo"
+  | "redo"
   | "toggleBold"
   | "toggleItalic"
   | "toggleStrike"
@@ -129,6 +135,8 @@ type EditorAction =
   | "setHorizontalRule";
 
 const editorActions: Record<EditorAction, VoidFunction> = {
+  undo: () => editor.chain().focus().undo().run(),
+  redo: () => editor.chain().focus().redo().run(),
   liftListItem: () => editor.chain().focus().liftListItem("listItem").run(),
   sinkListItem: () => editor.chain().focus().sinkListItem("listItem").run(),
   toggleBulletListItem: () => editor.chain().focus().toggleBulletList().run(),
