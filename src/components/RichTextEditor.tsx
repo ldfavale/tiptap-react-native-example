@@ -15,12 +15,14 @@ import type {
   NativeMessage,
   WebViewMessage,
 } from "../editor/main";
+import { colorButtons } from "../constants/colors";
 
 interface RichTextEditorProps {
   content?: string;
 }
 export const RichTextEditor = (props: RichTextEditorProps) => {
   const { content = "" } = props;
+  const [colorPickerOpened, setColorPickerOpened] = useState(false)
   const [editorState, setEditorState] = useState<EditorState>({
     html: "",
     json: {},
@@ -58,6 +60,13 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
 
   function sendMessageToWebView(message: NativeMessage) {
      webViewRef?.current?.postMessage(JSON.stringify(message));
+  }
+
+  const handleOnPressColor = (item) => {
+    if(item.command == "setColor")
+      sendMessageToWebView({ kind: item.command, payload: item.code })
+    else if (item.command == "unsetColor")
+      sendMessageToWebView({ kind: "action", payload: item.command })
   }
 
   const editorCommands = [
@@ -124,6 +133,18 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
           : styles.actionInactive,
       ],
       text: "undln"
+    },
+    {
+      onPress: () => {
+        setColorPickerOpened(!colorPickerOpened)
+      },
+        style: [
+        styles.actionDefault,
+        editorState.isUnderlineActive
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "color"
     },
     {
       onPress: () => {
@@ -238,27 +259,40 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.actions}>
+        <FlatList
+          data={editorCommands}
+          horizontal
+          renderItem={({item, index, separators}) => (
+            <TouchableOpacity
+              key={item.text}
+              onPress={item.onPress}
+              style={item.style}
+              disabled={item.disabled}
+              >
+              <Text>{item.text}</Text>
+            </TouchableOpacity>
+          )}
+        />
 
-      <FlatList
-        data={editorCommands}
+      {colorPickerOpened && <FlatList
+        data={colorButtons}
         horizontal
         renderItem={({item, index, separators}) => (
           <TouchableOpacity
-            key={item.text}
-            onPress={item.onPress}
-            style={item.style}
-            disabled={item.disabled}
+            key={item.code}
+            onPress={() => { handleOnPressColor(item) }}
+            style={{...styles.colorPickerButton,backgroundColor: item.code}}
             >
-            <Text>{item.text}</Text>
           </TouchableOpacity>
         )}
-      />
+      />}
       </View>
       <TouchableWithoutFeedback
         onPress={() => {
           sendMessageToWebView({ kind: "editor", payload: "focus" });
         }}
       >
+      <>
         <WebView
           ref={webViewRef}
           style={styles.webview}
@@ -281,6 +315,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
           }}
           source={{ html: `${editorHtml}` }}
         />
+     </>
       </TouchableWithoutFeedback>
     </View>
   );
@@ -291,7 +326,7 @@ const styles = {
     container: {
       flex: 1,
     },
-    actions: { flexDirection: "row", gap: 4, padding: 4 },
+    actions: { flexDirection: "column", gap: 4, padding: 4 },
     actionDefault: {
       padding: 6,
       borderRadius: 6,
@@ -305,5 +340,9 @@ const styles = {
       flex: 1,
       minHeight: 140,
     },
+    colorPickerButton:{
+      width: 20,
+      height: 20
+    }
   }),
 };

@@ -6,6 +6,9 @@ import Blockquote from '@tiptap/extension-blockquote'
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import Underline from '@tiptap/extension-underline'
+import { Color } from '@tiptap/extension-color'
+import TextStyle from '@tiptap/extension-text-style'
+
 
 
 
@@ -95,7 +98,9 @@ const editor = new Editor({
     TaskItem.configure({
       nested: true,
     }),
-    Underline
+    Underline,
+    Color,
+    TextStyle
 
 
 ],
@@ -132,7 +137,8 @@ type EditorAction =
   | "toggleH2"
   | "toggleH3"
   | "toggleBlockquote"
-  | "setHorizontalRule";
+  | "setHorizontalRule"
+  | "unsetColor";
 
 const editorActions: Record<EditorAction, VoidFunction> = {
   undo: () => editor.chain().focus().undo().run(),
@@ -150,14 +156,16 @@ const editorActions: Record<EditorAction, VoidFunction> = {
   toggleH2: () => editor.chain().focus().toggleHeading({level:2}).run(),
   toggleH3: () => editor.chain().focus().toggleHeading({level:3}).run(),
   toggleBlockquote: () => editor.chain().focus().toggleBlockquote().run(),
-  setHorizontalRule: () => editor.chain().focus().setHorizontalRule().run()
+  setHorizontalRule: () => editor.chain().focus().setHorizontalRule().run(),
+  unsetColor: () => editor.chain().focus().unsetColor().run()
 };
 
 export type NativeMessage =
   | { kind: "action"; payload: EditorAction }
   | { kind: "editor"; payload: "focus" | "blur" }
   | { kind: "initialContent"; payload: string }
-  | { kind: "insertImage"; payload: string };
+  | { kind: "insertImage"; payload: string }
+  | { kind: "setColor"; payload: string };
 
 function handleMessageEvent(event: MessageEvent | Event) {
   const message: { data: string } = event as { data: string };
@@ -171,6 +179,9 @@ function handleMessageEvent(event: MessageEvent | Event) {
   }
   if (nativeMessage.kind === "insertImage") {
     editor.chain().focus().setImage({ src: nativeMessage.payload }).run();
+  }
+  if (nativeMessage.kind === "setColor") {
+    editor.chain().focus().setColor(nativeMessage.payload).run();
   }
   if (nativeMessage.kind === "editor") {
     if (nativeMessage.payload === "focus") {
