@@ -9,6 +9,8 @@ import Underline from '@tiptap/extension-underline'
 import { Color } from '@tiptap/extension-color'
 import TextStyle from '@tiptap/extension-text-style'
 import Highlight from '@tiptap/extension-highlight'
+import Youtube from "@tiptap/extension-youtube";
+
 
 
 
@@ -102,7 +104,11 @@ const editor = new Editor({
     Underline,
     Color,
     TextStyle,
-    Highlight.configure({ multicolor: true })
+    Highlight.configure({ multicolor: true }),
+    Youtube.configure({
+      width: 320,
+      interfaceLanguage: 'en',
+    })
 
 
 ],
@@ -170,7 +176,8 @@ export type NativeMessage =
   | { kind: "initialContent"; payload: string }
   | { kind: "insertImage"; payload: string }
   | { kind: "setColor"; payload: string }
-  | { kind: "setHighlight"; payload: string };
+  | { kind: "setHighlight"; payload: string }
+  | { kind: "insertVideo"; payload: {url: string, width:number, height:number} };
 
 function handleMessageEvent(event: MessageEvent | Event) {
   const message: { data: string } = event as { data: string };
@@ -184,6 +191,13 @@ function handleMessageEvent(event: MessageEvent | Event) {
   }
   if (nativeMessage.kind === "insertImage") {
     editor.chain().focus().setImage({ src: nativeMessage.payload }).run();
+  }
+  if (nativeMessage.kind === "insertVideo") {
+      editor.commands.setYoutubeVideo({
+        src: nativeMessage.payload.url,
+        width: Math.max(320, nativeMessage.payload.width) || 640,
+        height: Math.max(180, nativeMessage.payload.height) || 480,
+      })
   }
   if (nativeMessage.kind === "setColor") {
     editor.chain().focus().setColor(nativeMessage.payload).run();

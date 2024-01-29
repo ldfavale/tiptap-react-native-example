@@ -16,6 +16,9 @@ import type {
   WebViewMessage,
 } from "../editor/main";
 import SimpleColorPicker from "./SimpleColorPicker";
+import {Dimensions} from 'react-native';
+
+
 interface RichTextEditorProps {
   content?: string;
 }
@@ -281,6 +284,18 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
         styles.actionDefault
       ],
       text: "Img",
+    },
+    {
+      onPress: () => {
+        const url = "https://www.youtube.com/watch?v=jt5BPdxAMBo"
+        const width = Dimensions.get('window').width - 40;
+        const height = width / (16 / 9);
+        sendMessageToWebView({ kind: "insertVideo", payload: {url, width, height} });
+    },
+      style: [
+        styles.actionDefault
+      ],
+      text: "Video",
     },
   ]
 
