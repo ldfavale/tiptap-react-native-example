@@ -15,14 +15,14 @@ import type {
   NativeMessage,
   WebViewMessage,
 } from "../editor/main";
-import { colorButtons } from "../constants/colors";
-
+import SimpleColorPicker from "./SimpleColorPicker";
 interface RichTextEditorProps {
   content?: string;
 }
 export const RichTextEditor = (props: RichTextEditorProps) => {
   const { content = "" } = props;
-  const [colorPickerOpened, setColorPickerOpened] = useState(false)
+  const [colorMode, setColorMode] = useState("")
+  const COLOR_MODES = {highlight: "highlight", color: "color"}
   const [editorState, setEditorState] = useState<EditorState>({
     html: "",
     json: {},
@@ -62,11 +62,21 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
      webViewRef?.current?.postMessage(JSON.stringify(message));
   }
 
-  const handleOnPressColor = (item) => {
-    if(item.command == "setColor")
-      sendMessageToWebView({ kind: item.command, payload: item.code })
-    else if (item.command == "unsetColor")
-      sendMessageToWebView({ kind: "action", payload: item.command })
+  const handleOnPressColor = (item:string,mode:string) => {
+    if(mode.length <= 0) return
+    if (mode == COLOR_MODES.color)
+    sendMessageToWebView({ kind: "setColor", payload: item })
+  else if (mode == COLOR_MODES.highlight)
+    sendMessageToWebView({ kind: "setHighlight", payload: item })
+
+  }
+
+  const handleOnPressUnset = () => {
+    if (colorMode.length <= 0) return
+    if (colorMode == COLOR_MODES.color)
+      sendMessageToWebView({ kind: "action", payload: "unsetColor" })
+    else if (colorMode == COLOR_MODES.highlight)
+      sendMessageToWebView({ kind: "action", payload: "unsetHighlight" })
   }
 
   const editorCommands = [
@@ -136,15 +146,33 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     },
     {
       onPress: () => {
-        setColorPickerOpened(!colorPickerOpened)
+        if(colorMode == COLOR_MODES.color)
+          setColorMode("")
+        else
+          setColorMode(COLOR_MODES.color)
       },
         style: [
         styles.actionDefault,
-        editorState.isUnderlineActive
+        colorMode == COLOR_MODES.color
           ? styles.actionActive
           : styles.actionInactive,
       ],
-      text: "color"
+      text: COLOR_MODES.color,
+    },
+    {
+      onPress: () => {
+        if(colorMode == COLOR_MODES.highlight)
+          setColorMode("")
+        else
+          setColorMode(COLOR_MODES.highlight)
+      },
+        style: [
+        styles.actionDefault,
+        colorMode == COLOR_MODES.highlight
+          ? styles.actionActive
+          : styles.actionInactive,
+      ],
+      text: "HL",
     },
     {
       onPress: () => {
@@ -274,18 +302,12 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
           )}
         />
 
-      {colorPickerOpened && <FlatList
-        data={colorButtons}
-        horizontal
-        renderItem={({item, index, separators}) => (
-          <TouchableOpacity
-            key={item.code}
-            onPress={() => { handleOnPressColor(item) }}
-            style={{...styles.colorPickerButton,backgroundColor: item.code}}
-            >
-          </TouchableOpacity>
-        )}
-      />}
+      {colorMode.length > 0 &&
+      <SimpleColorPicker
+        handleOnPressColor={handleOnPressColor}
+        handleOnPressUnset={handleOnPressUnset}
+        mode={colorMode} />
+      }
       </View>
       <TouchableWithoutFeedback
         onPress={() => {
@@ -340,9 +362,5 @@ const styles = {
       flex: 1,
       minHeight: 140,
     },
-    colorPickerButton:{
-      width: 20,
-      height: 20
-    }
   }),
 };

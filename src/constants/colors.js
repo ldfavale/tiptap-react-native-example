@@ -15,5 +15,3 @@ export const colors = [
   "#F5EEFF",
 ];
 
-
-export const colorButtons = [...colors.map((color) => { return  {code: color, command: "setColor"}}),{code:"#000000",command: "unsetColor"}]
