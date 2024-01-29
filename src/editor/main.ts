@@ -10,7 +10,7 @@ import { Color } from '@tiptap/extension-color'
 import TextStyle from '@tiptap/extension-text-style'
 import Highlight from '@tiptap/extension-highlight'
 import Youtube from "@tiptap/extension-youtube";
-
+import { SmilieReplacer } from './SmilieReplacer'
 
 
 
@@ -108,7 +108,8 @@ const editor = new Editor({
     Youtube.configure({
       width: 320,
       interfaceLanguage: 'en',
-    })
+    }),
+    SmilieReplacer
 
 
 ],
